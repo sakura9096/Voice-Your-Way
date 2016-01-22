@@ -1,58 +1,105 @@
-from flask import Flask, render_template, json, request
-from flask.ext.mysql import MySQL
-from werkzeug import generate_password_hash, check_password_hash
+from flask import Flask, render_template, json, request, redirect, session
+import sqlite3
 
-mysql = MySQL()
+
 app = Flask(__name__)
-
-# MySQL configurations
-app.config['MYSQL_DATABASE_USER'] = 'jay'
-app.config['MYSQL_DATABASE_PASSWORD'] = 'jay'
-app.config['MYSQL_DATABASE_DB'] = 'BucketList'
-app.config['MYSQL_DATABASE_HOST'] = 'localhost'
-mysql.init_app(app)
+app.secret_key = 'why would I tell you my secret key?'
 
 
+# home page
 @app.route('/')
 def main():
     return render_template('index.html')
 
+# show sign up page
 @app.route('/showSignUp')
 def showSignUp():
     return render_template('signup.html')
 
-
-@app.route('/signUp',methods=['POST','GET'])
+# sign up page, POST method
+@app.route('/signUp', methods=['POST', 'GET'])
 def signUp():
-    try:
-        _name = request.form['inputName']
-        _email = request.form['inputEmail']
-        _password = request.form['inputPassword']
+    conn = sqlite3.connect('user.sqlite', timeout=1, check_same_thread=False)
+    cur = conn.cursor()
 
-        # validate the received values
-        if _name and _email and _password:
-            
-            # All Good, let's call MySQL
-            
-            conn = mysql.connect()
-            cursor = conn.cursor()
-            _hashed_password = generate_password_hash(_password)
-            cursor.callproc('sp_createUser',(_name,_email,_hashed_password))
-            data = cursor.fetchall()
+	# create some tables
+    cur.executescript('''
+    CREATE TABLE IF NOT EXISTS User (
+	    name TEXT NOT NULL PRIMARY KEY,
+	    email TEXT,
+	    password TEXT
+    );
+    ''')
 
-            if len(data) is 0:
-                conn.commit()
-                return json.dumps({'message':'User created successfully !'})
-            else:
-                return json.dumps({'error':str(data[0])})
-        else:
-            return json.dumps({'html':'<span>Enter the required fields</span>'})
+    # extract values from user submission
+    _name = request.form['inputName']
+    _email = request.form['inputEmail']
+    _password = request.form['inputPassword']
 
-    except Exception as e:
-        return json.dumps({'error':str(e)})
-    finally:
-        cursor.close() 
+	# check if user name already exists
+    cur.execute('SELECT COUNT(*) FROM User WHERE name = ? ', (_name, ))
+    exist_name = int(cur.fetchone()[0])
+
+    if exist_name == 0:
+        cur.execute('''INSERT INTO User ( name, email, password ) 
+            VALUES ( ?, ?, ? )''', ( _name, _email, _password ) )
+
+        conn.commit()
+
+        cur.close() 
         conn.close()
 
+        session['user'] = _name
+        return redirect('/userHome') 
+    else:
+        return redirect('/signUpFail')
+
+# sign up fail
+@app.route('/signUpFail')
+def showSignUpFail():
+    return render_template('signupFail.html')
+
+# sign in page
+@app.route('/showSignin')
+def showSignin():
+    return render_template('signin.html')
+
+# validate login
+@app.route('/validateLogin', methods=['POST'])
+def validateLogin():
+    conn = sqlite3.connect('user.sqlite', timeout=1, check_same_thread=False)
+    cur = conn.cursor()
+
+    # extract values from user submission
+    _name = request.form['inputName']
+    _email = request.form['inputEmail']
+    _password = request.form['inputPassword']
+
+	# check if user info match
+    cur.execute('SELECT name, email, password FROM User WHERE name = ? ', (_name, ))
+    data = cur.fetchone()
+
+    if _email != data[1] or _password != data[2]:
+    	return render_template('error.html', error = 'Wrong Info')
+    
+    session['user'] = data[0]
+    return redirect('/userHome')
+
+# user home
+@app.route('/userHome')
+def userHome():
+    if session.get('user'):
+        return render_template('userHome.html')
+    else:
+        return render_template('error.html', error = 'Unauthorized Access')
+
+# user log out
+@app.route('/logout')
+def logout():
+    session.pop('user', None)
+    return redirect('/')
+
+
+# run program
 if __name__ == "__main__":
-    app.run(port=5002)
+    app.run(debug=True)
