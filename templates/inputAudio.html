@@ -3,7 +3,7 @@
  
 <head>
     <title>Python Flask Bucket List App</title>
- 
+
     <link href="http://getbootstrap.com/dist/css/bootstrap.min.css" rel="stylesheet"> 
     <link href="http://getbootstrap.com/examples/jumbotron-narrow/jumbotron-narrow.css" rel="stylesheet">
     <link href="../static/css/signup.css" rel="stylesheet">
@@ -11,7 +11,6 @@
 </head>
  
 <body>
- 
     <div class="container">
         <div class="header">
             <nav>
@@ -22,12 +21,16 @@
             </nav>
             <h3 class="text-muted">Python Flask App</h3>
         </div>
- 
+
         <div class="jumbotron">
-            <h1>Welcome Home !!</h1>
- 
-        </div>
- 
+            <h1>Input Audio Here</h1>
+            <form class="form-signin" action="/showAudioContext" method="post">
+              <label for="inputName" class="sr-only">Audio</label>
+              <input type="name" name="inputName" id="inputName" class="form-control" placeholder="Audio" required autofocus>
+
+              <input id="btnSignUp" class="btn btn-lg btn-primary btn-block" type="submit" name="audio" value="Submit">
+            </form>
+        </div>  
  
         <footer class="footer">
             <p>&copy; Company 2015</p>

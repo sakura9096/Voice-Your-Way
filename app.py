@@ -17,7 +17,7 @@ def showSignUp():
     return render_template('signup.html')
 
 # sign up page, POST method
-@app.route('/signUp', methods=['POST', 'GET'])
+@app.route('/signUp', methods=['POST'])
 def signUp():
     conn = sqlite3.connect('user.sqlite', timeout=1, check_same_thread=False)
     cur = conn.cursor()
@@ -80,7 +80,7 @@ def validateLogin():
     data = cur.fetchone()
 
     if _email != data[1] or _password != data[2]:
-    	return render_template('error.html', error = 'Wrong Info')
+    	return render_template('error.html', error='Wrong Info')
     
     session['user'] = data[0]
     return redirect('/userHome')
@@ -91,13 +91,25 @@ def userHome():
     if session.get('user'):
         return render_template('userHome.html')
     else:
-        return render_template('error.html', error = 'Unauthorized Access')
+        return render_template('error.html', error='Unauthorized Access')
 
 # user log out
 @app.route('/logout')
 def logout():
     session.pop('user', None)
     return redirect('/')
+
+# prompt for user input audio
+@app.route('/inputAudio')
+def inputAudio():
+    return render_template('inputAudio.html')
+
+# show audio context page
+@app.route('/showAudioContext', methods=['POST'])
+def showAudioContext():
+    # extract values from user submission
+    _audio = request.form['inputName']
+    return render_template('showAudioContext.html', audio_msg=_audio)
 
 
 # run program
