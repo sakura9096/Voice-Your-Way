@@ -2,8 +2,8 @@
 
   <head>
     <script src="../static/js/hound-web-sdk.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0-beta1/jquery.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/semantic.min.css">
-
     <script src='https://code.responsivevoice.org/responsivevoice.js'></script>
   </head>
 
@@ -22,22 +22,23 @@
           </button>
         </div>
 
+        
+
         <div class="ui field" hidden>
           <label>Response object</label>
           <textarea id="responseJSON"></textarea>
         </div>
-        <div class="ui field" hidden>
+        <!-- <div class="ui field" hidden>
           <label>Search info object</label>
           <textarea id="infoJSON"></textarea>
-        </div>
+        </div> -->
       </form>
     </div>
+    <!-- <span class="col-md-1">
 
-    <div class="col-md-1">
+        <input id="playbutton" type='button' value='Play'/>
 
-        <input id="play" onclick="" type="button" value="Play"/>
-
-    </div>
+    </span> -->
 
     <script> 
 
@@ -45,6 +46,7 @@
       var jsonElet = document.getElementById("responseJSON");
       var infoElet = document.getElementById("infoJSON");
 
+      var latestMessage = '';
 
       //REQUEST INFO JSON
       var requestInfo = {
@@ -82,19 +84,19 @@
           console.log('hello world');
           console.log(response);
           if (response.AllResults && response.AllResults[0] !== undefined) {
+            latestMessage = response.AllResults[0].SpokenResponseLong;
+            responsiveVoice.speak(latestMessage);
             jsonElet.value = JSON.stringify(response.AllResults[0].SpokenResponseLong, undefined, 2);
             jsonElet.parentNode.hidden = false;
-            // infoElet.value = JSON.stringify(info, undefined, 2);
-            // infoElet.parentNode.hidden = false;
+            infoElet.value = JSON.stringify(info, undefined, 2);
+            infoElet.parentNode.hidden = false;
           }
         },
 
         onAbort: function(info) {},
 
         onError: function(err, info) {
-          jsonElet.parentNode.hidden = true;
-          infoElet.value = JSON.stringify(info, undefined, 2);
-          infoElet.parentNode.hidden = false;
+          alert(JSON.stringify(info));
           document.getElementById("voiceIcon").className = "unmute big icon";
         },
 
@@ -174,6 +176,12 @@
         var query = document.getElementById('query').value;
         textSearch.search(query, requestInfo);
       } 
+
+
+      var playbutton = $('#playbutton');
+      playbutton.on('click', function (e) {
+        responsiveVoice.speak(latestMessage);
+      });
 
     </script>
 
