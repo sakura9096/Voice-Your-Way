@@ -3,6 +3,8 @@
   <head>
     <script src="../static/js/hound-web-sdk.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/semantic.min.css">
+
+    <script src='https://code.responsivevoice.org/responsivevoice.js'></script>
   </head>
 
   <body>
@@ -20,8 +22,6 @@
           </button>
         </div>
 
-        <input type="file" id="file" onchange="onFileUpload()" />
-
         <div class="ui field" hidden>
           <label>Response object</label>
           <textarea id="responseJSON"></textarea>
@@ -33,6 +33,11 @@
       </form>
     </div>
 
+    <div class="col-md-1">
+
+        <input id="play" onclick="" type="button" value="Play"/>
+
+    </div>
 
     <script> 
 
@@ -77,10 +82,10 @@
           console.log('hello world');
           console.log(response);
           if (response.AllResults && response.AllResults[0] !== undefined) {
-            jsonElet.value = JSON.stringify(response, undefined, 2);
+            jsonElet.value = JSON.stringify(response.AllResults[0].SpokenResponseLong, undefined, 2);
             jsonElet.parentNode.hidden = false;
-            infoElet.value = JSON.stringify(info, undefined, 2);
-            infoElet.parentNode.hidden = false;
+            // infoElet.value = JSON.stringify(info, undefined, 2);
+            // infoElet.parentNode.hidden = false;
           }
         },
 

@@ -11,7 +11,7 @@ msg = ""
 # home page
 @app.route('/')
 def main():
-    return render_template('hound.html')
+    return render_template('index.html')
 
 # show sign up page
 @app.route('/showSignUp')
@@ -107,6 +107,11 @@ def showAudioContext():
     audio = request.form['inputName']
     msg = houndify.run(audio)
     return render_template('showAudioContext.html', audio_msg=msg, text="https://twitter.com/intent/tweet?text=%s" % msg)
+
+# show hound audio input page
+@app.route('/showHound')
+def showHound():
+    return render_template('hound.html')
 
 
 # run program
