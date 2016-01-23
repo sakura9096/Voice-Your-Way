@@ -52,14 +52,8 @@ def signUp():
         conn.close()
 
         session['user'] = _name
-        return redirect('/userHome') 
-    else:
-        return redirect('/signUpFail')
-
-# sign up fail
-@app.route('/signUpFail')
-def showSignUpFail():
-    return render_template('signupFail.html')
+        
+    return redirect('/showSignUp')
 
 # sign in page
 @app.route('/showSignin')
