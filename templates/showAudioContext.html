@@ -1,29 +1,32 @@
-<!DOCTYPE html>
-<html lang="en">
- 
-<head>
-    <title>Voice Your Way</title>
- 
+<html>
+
+  <head>
+
     <link href="http://getbootstrap.com/dist/css/bootstrap.min.css" rel="stylesheet"> 
     <link href="http://getbootstrap.com/examples/jumbotron-narrow/jumbotron-narrow.css" rel="stylesheet">
     <link href="../static/css/signup.css" rel="stylesheet">
 
-    <script src='https://code.responsivevoice.org/responsivevoice.js'></script>
-</head>
- 
-<body>
- 
+    <script src="../static/js/hound-web-sdk.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0-beta1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/semantic.min.css">
+    
+  </head>
+
+  <body>
+
     <div class="container">
+
         <div class="header">
             <nav>
-                <ul class="nav nav-pills pull-right">
-                    <li role="presentation" class="active"><a href="/logout">Logout</a>
-                    </li>
-                </ul>
+              <ul class="nav nav-pills pull-right">
+                <li role="presentation" class="active"><a href="/">Home</a></li>
+                <li role="presentation"><a href="/showSignin">Sign In</a></li>
+                <li role="presentation" ><a href="/showSignUp">Sign Up</a></li>
+              </ul>
             </nav>
             <h3 class="text-muted">Voice Your Way</h3>
         </div>
- 
+
         <div class="jumbotron">
             <h1>{{audio_msg}}</h1>
  
@@ -32,7 +35,7 @@
         <div class="row">
 
             <span class="twitter button" class="col-md-2">
-                <a href="{{text}}" data-url="http://" data-size="large" class="twitter-share-button">Twitter</a>
+                <a href="https://twitter.com/intent/tweet?text=" data-url="http://" data-size="large" class="twitter-share-button">Twitter</a>
                 <script>
                     !function(d,s,id){
                         var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';
@@ -45,11 +48,7 @@
                     }(document,'script','twitter-wjs');
                 </script>
             </span>
-            <span class="col-md-1">
-
-                <input onclick='responsiveVoice.speak("{{audio_msg}}");' type='button' value='Play'/>
-
-            </span>
+            
         </div>
 
         <footer class="footer">
@@ -57,7 +56,174 @@
         </footer>
 
     </div>
+    <div class="ui center aligned basic segment container">
+      <h2 class="ui block basic header">Houndify Web SDK Demo</h2>
+      <form id="form" class="ui form" action="javascript:void(0);">
 
-</body>
- 
+        <div class="ui action huge labeled input field">
+          <div class="ui icon basic button" onclick="startStopVoiceSearch()">
+            <i id="voiceIcon" class="unmute big icon"></i>
+          </div>
+          <input id="query" type="text" placeholder="query?" />
+          <button id="textSearchButton" class="ui icon button" onclick="doTextSearch()"> 
+             <i class="search big icon"></i>
+          </button>
+        </div>
+
+        
+
+        <div class="ui field" hidden>
+          <label>Response object</label>
+          <textarea id="responseJSON"></textarea>
+        </div>
+        <!-- <div class="ui field" hidden>
+          <label>Search info object</label>
+          <textarea id="infoJSON"></textarea>
+        </div> -->
+      </form>
+    </div>
+    
+
+    <script> 
+
+      //HTML ELEMENTS FOR DISPLAYING RESPONSE AND INFO JSON's
+      var jsonElet = document.getElementById("responseJSON");
+      var infoElet = document.getElementById("infoJSON");
+
+      var audio_msg = '';
+
+      //REQUEST INFO JSON
+      var requestInfo = {
+         PartialTranscriptsDesired: true,
+         ClientID: "lSSQlBzn_k-LlMKtGTzb9A=="
+      };
+
+
+      //INITIALIZE COMMON CONVERSATION OBJECT FOR STORING CONVERSATION STATE
+      var myConversation = new Hound.Conversation();
+
+
+      //INITIALIZE SPEECH TO TEXT OBJECT
+      var voiceSearch = new Hound.VoiceSearch({
+
+        // provide client information here if connection is secure
+        // to skip the authentication on server side
+        client: {
+          clientId: "lSSQlBzn_k-LlMKtGTzb9A==",
+          clientKey: "vQuRBURzWXbyn1TE7L1n6Y6NoKlsV3NO4jldEZJfN2eVsmcPakbSid2TlbhFAaxIF9kA1io-1W1gtAjsspeUCA=="
+        },
+
+    
+
+        conversation: myConversation,
+
+        enableVAD: true,
+
+        onTranscriptionUpdate: function(trObj) {
+          var transcriptElt = document.getElementById("query");
+          transcriptElt.value = trObj.PartialTranscript;
+        },
+
+        onResponse: function(response, info) {
+          console.log('hello world');
+          console.log(response);
+          if (response.AllResults && response.AllResults[0] !== undefined) {
+            audio_msg = response.AllResults[0].SpokenResponseLong;
+            console.log("Hello" + audio_msg);
+            jsonElet.value = JSON.stringify(response.AllResults[0].SpokenResponseLong, undefined, 2);
+            jsonElet.parentNode.hidden = false;
+            // infoElet.value = JSON.stringify(info, undefined, 2);
+            // infoElet.parentNode.hidden = false;
+          }
+        },
+
+        onAbort: function(info) {},
+
+        onError: function(err, info) {
+          alert(JSON.stringify(info));
+          document.getElementById("voiceIcon").className = "unmute big icon";
+        },
+
+        onRecordingStarted: function() {
+          document.getElementById("voiceIcon").className = "selected radio icon big red";
+        },
+
+        onRecordingStopped: function(recording) {
+          document.getElementById("voiceIcon").className = "unmute big icon";
+          document.getElementById("textSearchButton").disabled = false;
+          document.getElementById("query").readOnly = false;
+        },
+
+        onAudioFrame: function(frame) {}
+
+      });
+
+
+      //START OR STOP VOICE SEARCH
+      function startStopVoiceSearch() {
+        if (voiceSearch.isState("streaming")) {
+          voiceSearch.stop();
+        } else {
+          voiceSearch.start(requestInfo);
+          document.getElementById("voiceIcon").className = "loading circle notched icon big";
+          document.getElementById("textSearchButton").disabled = true;
+          document.getElementById("query").readOnly = true;  
+        }
+      }
+
+
+      //UPLOAD AUDIO FILE
+      function onFileUpload() {
+        var fileElt = document.getElementById("file");
+        var file = fileElt.files[0];
+        if (!file) return;
+
+        var reader = new FileReader();
+        reader.onload = function(){
+          var arrayBuffer = reader.result;
+          voiceSearch.upload(arrayBuffer, requestInfo);
+        };
+        reader.readAsArrayBuffer(file);
+      }
+
+
+      //INITIALIZE TEXT SEARCH OBJECT
+      var textSearch = new Hound.TextSearch({
+
+        proxy: {
+          route: "/textSearchProxy",
+          method: "GET"
+        },
+
+        conversation: myConversation,
+
+        onResponse: function(response, info) {
+          if (response.AllResults && response.AllResults[0] !== undefined) {
+            jsonElet.value = JSON.stringify(response, undefined, 2);
+            jsonElet.parentNode.hidden = false;
+            infoElet.value = JSON.stringify(info, undefined, 2);
+            infoElet.parentNode.hidden = false;
+          }
+        },
+
+        onError: function(err, info) {
+          jsonElet.parentNode.hidden = true;
+          infoElet.value = JSON.stringify(info, undefined, 2);
+          infoElet.parentNode.hidden = false;
+        }
+
+      });
+      
+
+      //START TEXT SEARCH
+      function doTextSearch() {
+        var query = document.getElementById('query').value;
+        textSearch.search(query, requestInfo);
+      } 
+
+
+    </script>
+
+  </body>
+
 </html>

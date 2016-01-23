@@ -101,13 +101,13 @@ def inputAudio():
     return render_template('inputAudio.html')
 
 # show audio context page
-@app.route('/showAudioContext', methods=['POST'])
+@app.route('/showAudioContext')
 def showAudioContext():
     # extract values from user submission
-    audio = request.form['inputName']
-    msg = houndify.run(audio)
-    return render_template('showAudioContext.html', audio_msg=msg, text="https://twitter.com/intent/tweet?text=%s" % msg)
-
+    #audio = request.form['inputName']
+    #msg = houndify.run(audio)
+    # return render_template('showAudioContext.html', audio_msg=msg, text="https://twitter.com/intent/tweet?text=%s" % msg)
+    return render_template('showAudioContext.html')
 # show hound audio input page
 @app.route('/showHound')
 def showHound():
