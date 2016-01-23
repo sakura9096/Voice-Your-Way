@@ -1,10 +1,12 @@
 from flask import Flask, render_template, json, request, redirect, session
 import sqlite3
-
+import houndify
 
 app = Flask(__name__)
 app.secret_key = 'why would I tell you my secret key?'
 
+# global variable
+msg = ""
 
 # home page
 @app.route('/')
@@ -108,8 +110,9 @@ def inputAudio():
 @app.route('/showAudioContext', methods=['POST'])
 def showAudioContext():
     # extract values from user submission
-    _audio = request.form['inputName']
-    return render_template('showAudioContext.html', audio_msg=_audio)
+    audio = request.form['inputName']
+    msg = houndify.run(audio)
+    return render_template('showAudioContext.html', audio_msg=msg, text="https://twitter.com/intent/tweet?text=%s" % msg)
 
 
 # run program

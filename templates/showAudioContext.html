@@ -7,7 +7,8 @@
     <link href="http://getbootstrap.com/dist/css/bootstrap.min.css" rel="stylesheet"> 
     <link href="http://getbootstrap.com/examples/jumbotron-narrow/jumbotron-narrow.css" rel="stylesheet">
     <link href="../static/css/signup.css" rel="stylesheet">
- 
+
+    <script src='https://code.responsivevoice.org/responsivevoice.js'></script>
 </head>
  
 <body>
@@ -24,16 +25,34 @@
         </div>
  
         <div class="jumbotron">
-            <h1>{{ audio_msg }}</h1>
+            <h1>{{audio_msg}}</h1>
  
         </div>
  
- 
+        <div class="twitter button">
+            <a href="{{text}}" data-url="http://" data-size="large" class="twitter-share-button">Twitter</a>
+
+            <script>
+              !function(d,s,id){
+                  var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';
+                  if(!d.getElementById(id)){
+                    js=d.createElement(s);
+                    js.id=id;
+                    js.src=p+'://platform.twitter.com/widgets.js';
+                    fjs.parentNode.insertBefore(js,fjs);
+                  }
+                }(document,'script','twitter-wjs');
+            </script>
+        </div>
+
+        <input onclick='responsiveVoice.speak("{{audio_msg}}");' type='button' value='Play'/>
+
         <footer class="footer">
             <p>&copy; Company 2015</p>
         </footer>
- 
+
     </div>
+
 </body>
  
 </html>
