@@ -11,7 +11,7 @@ msg = ""
 # home page
 @app.route('/')
 def main():
-    return render_template('index.html')
+    return render_template('hound.html')
 
 # show sign up page
 @app.route('/showSignUp')
