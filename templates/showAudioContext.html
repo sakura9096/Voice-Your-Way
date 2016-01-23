@@ -2,13 +2,41 @@
 
   <head>
 
-    <link href="http://getbootstrap.com/dist/css/bootstrap.min.css" rel="stylesheet"> 
-    <link href="http://getbootstrap.com/examples/jumbotron-narrow/jumbotron-narrow.css" rel="stylesheet">
-    <link href="../static/css/signup.css" rel="stylesheet">
-
     <script src="../static/js/hound-web-sdk.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0-beta1/jquery.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/semantic.min.css">
+
+    <link href="http://getbootstrap.com/dist/css/bootstrap.min.css" rel="stylesheet">
+ 
+    <link href="http://getbootstrap.com/examples/jumbotron-narrow/jumbotron-narrow.css" rel="stylesheet">
+    <link href="../static/css/signup.css" rel="stylesheet">
+    <script src="../static/js/jquery-1.11.2.js"></script>
+
+    <style>
+    .mybutton {
+      position: relative;
+    height: 20px;
+    padding: 1px 8px 1px 6px;
+    font-weight: 500;
+    color: #fff;
+    cursor: pointer;
+    background-color: #1b95e0;
+    border-radius: 3px;
+    box-sizing: border-box;
+    }
+    </style>
+
+    <script>
+          // !function(d,s,id){
+          //     var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';
+          //     if(!d.getElementById(id)){
+          //         js=d.createElement(s);
+          //         js.id=id;
+          //         js.src=p+'://platform.twitter.com/widgets.js';
+          //         fjs.parentNode.insertBefore(js,fjs);
+          //   }
+          // }(document,'script','twitter-wjs');
+      </script>
     
   </head>
 
@@ -33,20 +61,13 @@
         </div>
     
         <div class="row">
-
             <span class="twitter button" class="col-md-2">
-                <a href="https://twitter.com/intent/tweet?text=" data-url="http://" data-size="large" class="twitter-share-button">Twitter</a>
-                <script>
-                    !function(d,s,id){
-                        var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';
-                        if(!d.getElementById(id)){
-                            js=d.createElement(s);
-                            js.id=id;
-                            js.src=p+'://platform.twitter.com/widgets.js';
-                            fjs.parentNode.insertBefore(js,fjs);
-                      }
-                    }(document,'script','twitter-wjs');
-                </script>
+                <div id="twitter-button-wrapper">
+                  
+                  <a class="mybutton">Twitter</a>
+                  
+                </div>
+                
             </span>
             
         </div>
@@ -57,7 +78,7 @@
 
     </div>
     <div class="ui center aligned basic segment container">
-      <h2 class="ui block basic header">Houndify Web SDK Demo</h2>
+      <h2 class="ui block basic header">Voice Your Twitter</h2>
       <form id="form" class="ui form" action="javascript:void(0);">
 
         <div class="ui action huge labeled input field">
@@ -128,12 +149,14 @@
           console.log('hello world');
           console.log(response);
           if (response.AllResults && response.AllResults[0] !== undefined) {
+
+
             audio_msg = response.AllResults[0].SpokenResponseLong;
-            console.log("Hello" + audio_msg);
-            jsonElet.value = JSON.stringify(response.AllResults[0].SpokenResponseLong, undefined, 2);
-            jsonElet.parentNode.hidden = false;
-            // infoElet.value = JSON.stringify(info, undefined, 2);
-            // infoElet.parentNode.hidden = false;
+            console.log('updating the text to ' + 'https://twitter.com/intent/tweet?text=' + audio_msg);
+
+            var wrapper = $('#twitter-button-wrapper');
+            //$('#twitterBtn').attr('href', 'https://twitter.com/intent/tweet?text=' + audio_msg);
+           //twttr.widgets.load();
           }
         },
 
@@ -221,6 +244,13 @@
         textSearch.search(query, requestInfo);
       } 
 
+      //var out=document.getElementById("output");
+      //out.innerHTML=audio_msg;
+
+      $('.mybutton').click(function (e) {
+        console.log('click');
+        document.location.href = 'https://twitter.com/intent/tweet?text=' + audio_msg;
+      });
 
     </script>
 
